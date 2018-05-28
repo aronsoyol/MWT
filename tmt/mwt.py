@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 """
@@ -10,28 +10,27 @@ Name : MWT(Mongolian Word Tokenizer)
 """
 
 
-# In[65]:
+# In[2]:
 
 
 import os, sys, string
 from os import path
-from progressbar import ProgressBar
-from icu import UnicodeString, BreakIterator, Locale
+# from progressbar import ProgressBar
+# from icu import UnicodeString, BreakIterator, Locale
 from collections import defaultdict
 
 import time
-import argparse
 import click
 
 
-# In[62]:
+# In[3]:
 
 
-from nltk import word_tokenize
+# from nltk import word_tokenize
 # nltk.download('punkt')
 
 
-# In[3]:
+# In[4]:
 
 
 def containsMongolianChar(word):
@@ -41,7 +40,7 @@ def containsMongolianChar(word):
     return False
 
 
-# In[69]:
+# In[5]:
 
 
 MONGOLIAN_PUNCTUATIONS = "".join([chr(w) for w in range(0x1800,0x180a)])
@@ -50,13 +49,13 @@ MONGOLIAN_CONTROL_CHAR = "".join([chr(w) for w in range(0x180b,0x180f)])+"\u200d
 # CodeStr(MONGOLIAN_CONTROL_CHAR)
 
 
-# In[4]:
+# In[6]:
 
 
 STRIP_CHARS = string.ascii_letters             + string.whitespace             + string.punctuation             + string.digits             + MONGOLIAN_PUNCTUATIONS             + MONGOLIAN_DIGISTS             + "\u3008\u00b7\u00a7\u00ab<>\u300a\u3000\u300b\u1804\u1802\u1803\u0028\u0029\ufe15\ufe16\u7267\u6B4C\u2014\u00a0\u00ad\u00BA\u0020\u1802\u1803"
 
 
-# In[59]:
+# In[7]:
 
 
 def splitStemAndSuffix(word):
@@ -71,7 +70,7 @@ def splitStemAndSuffix(word):
 # stem, suffix = splitStemAndSuffix("asdf")
 
 
-# In[ ]:
+# In[8]:
 
 
 def CodeStr(text):
@@ -81,28 +80,29 @@ def CodeStr(text):
     return ",".join(["%04X"%(c) for c in ls])
 
 
-# In[11]:
+# ## pyicu is difficult to install 
+# 
+# ```
+# def split_line_with_icu(line):
+#     boundary = BreakIterator.createWordInstance(Locale.getUS())
+#     # text = "dasdf asdf asd f"
+#     boundary.setText(line)
+#     
+#     word_list = []
+#     
+#     start = boundary.first()
+# #         ls =[]
+#     for end in boundary:
+#         word = line[start:end ]
+#         word = word.strip(STRIP_CHARS)
+#         if ( word.strip() != "") and ( word.strip(MONGOLIAN_CONTROL_CHAR) != "" ) and (word.strip(MONGOLIAN_CONTROL_CHAR) != "") and containsMongolianChar(word) :
+#             word_list.append(word)
+#         start = end
+#     return word_list
+# ```
+# 
 
-
-def split_line_with_icu(line):
-    boundary = BreakIterator.createWordInstance(Locale.getUS())
-    # text = "dasdf asdf asd f"
-    boundary.setText(line)
-    
-    word_list = []
-    
-    start = boundary.first()
-#         ls =[]
-    for end in boundary:
-        word = line[start:end ]
-        word = word.strip(STRIP_CHARS)
-        if ( word.strip() != "") and ( word.strip(MONGOLIAN_CONTROL_CHAR) != "" ) and (word.strip(MONGOLIAN_CONTROL_CHAR) != "") and containsMongolianChar(word) :
-            word_list.append(word)
-        start = end
-    return word_list
-
-
-# In[10]:
+# In[9]:
 
 
 def split_line_with_py(line):
@@ -117,12 +117,12 @@ def split_line_with_py(line):
         
 
 
-# In[7]:
+# In[10]:
 
 
 @click.command()
 @click.option('--input-file', "-f", type=click.Path(exists=True), help='Input file' ,required=True)
-@click.option('--output-file', "-o", type=click.Path(exists=True), help='Output file', required=True)
+@click.option('--output-file', "-o", type=click.Path(), help='Output file', required=True)
 @click.option('--strip-mongolian-suffix', "-s", type=click.Choice(['yes', 'no']), help='strip-mongolian-suffix', default="no")
 # @click.option('--splitter', "-s", type=click.Path(), help='Output file', required=True)
 # @click.option('--with-icu-break', "-i", type=click.Path(), help='Output file', required=True)
@@ -135,18 +135,16 @@ def main(input_file, output_file, strip_mongolian_suffix):
         
     
     word_dict = defaultdict(lambda :0)
-    p = ProgressBar()
 #     r = opendb()
     outfile_path =""
     
     
-    split_line = split_line_with_icu
+    split_line = split_line_with_py
         
     
     
     with open(input_file, "r") as in_file:
-        for i, line in enumerate(p(in_file)):
-            p.update(i + 1)
+        for i, line in enumerate(in_file):
             line = line.strip()
             if line == "":
                 continue
@@ -176,12 +174,10 @@ def main(input_file, output_file, strip_mongolian_suffix):
             
 
 
-# In[ ]:
+# In[11]:
 
 
 if __name__ == '__main__':
-    
-    
     main()
     
     
