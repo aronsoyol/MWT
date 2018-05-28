@@ -102,18 +102,42 @@ def CodeStr(text):
 # ```
 # 
 
-# In[9]:
+# In[ ]:
 
 
-def tokenize(line):
-    
-    word_list_ = line.split(" ")
+def tokenize_split_suffix(text):
+    word_list_ = text.split(" ")
+    word_list = []
+    for word in word_list_:
+        word = word.strip(STRIP_CHARS)
+        if not word.strip() == "" and containsMongolianChar(word):
+            stem, suffix = splitStemAndSuffix(word)
+            if stem is None:
+                word_list.append(word)
+            else:
+                for s in suffix:
+                    word_list.append(s)
+    return word_list
+
+def tokenize_no_split_suffix(text):
+    word_list_ = text.split(" ")
     word_list = []
     for word in word_list_:
         word = word.strip(STRIP_CHARS)
         if not word.strip() == "" and containsMongolianChar(word):
             word_list.append(word)
     return word_list
+
+
+
+# In[9]:
+
+
+def tokenize(text, split_suffix = False):
+    if split_suffix:
+        return tokenize_split_suffix(text)
+    else: 
+        return tokenize_no_split_suffix(text)
         
 
 
