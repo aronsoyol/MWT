@@ -105,7 +105,7 @@ def CodeStr(text):
 # In[9]:
 
 
-def split_line_with_py(line):
+def tokenize(line):
     
     word_list_ = line.split(" ")
     word_list = []
@@ -139,7 +139,7 @@ def main(input_file, output_file, strip_mongolian_suffix):
     outfile_path =""
     
     
-    split_line = split_line_with_py
+    split_line = tokenize
         
     
     
