@@ -152,7 +152,7 @@ def tokenize_split_suffix(text):
             if stem is None:
                 word_list.append(word)
             else:
-                word_list.append(word)
+                word_list.append(stem)
                 for s in suffix:
                     word_list.append(s)
     return word_list
