@@ -18,6 +18,7 @@ from os import path
 # from progressbar import ProgressBar
 # from icu import UnicodeString, BreakIterator, Locale
 from collections import defaultdict
+import unicodedata3
 
 import time
 import click
@@ -52,7 +53,13 @@ MONGOLIAN_CONTROL_CHAR = "".join([chr(w) for w in range(0x180b,0x180f)])+"\u200d
 # In[6]:
 
 
-STRIP_CHARS = string.ascii_letters             + string.whitespace             + string.punctuation             + string.digits             + MONGOLIAN_PUNCTUATIONS             + MONGOLIAN_DIGISTS             + "\u3008\u00b7\u00a7\u00ab<>\u300a\u3000\u300b\u1804\u1802\u1803\u0028\u0029\ufe15\ufe16\u7267\u6B4C\u2014\u00a0\u00ad\u00BA\u0020\u1802\u1803"
+STRIP_CHARS = string.ascii_letters \
+            + string.whitespace \
+            + string.punctuation \
+            + string.digits \
+            + MONGOLIAN_PUNCTUATIONS \
+            + MONGOLIAN_DIGISTS \
+            + "\u3008\u00b7\u00a7\u00ab<>\u300a\u3000\u300b\u1804\u1802\u1803\u0028\u0029\ufe15\ufe16\u7267\u6B4C\u2014\u00a0\u00ad\u00BA\u0020\u1802\u1803"
 
 
 # In[7]:
@@ -104,13 +111,43 @@ def CodeStr(text):
 
 # In[ ]:
 
+def WordIter(text):
+#     print(len(text2))
+
+
+    if len (text ) == 1:
+        return unicodedata3.script_cat(tex)[0],  unicodedata3.script_cat(text[0])[0] == unicodedata3.Script.Mongolian
+
+    script = -1
+    lastScript = unicodedata3.script_cat(text[0])[0]
+    start = 0
+    isMongolian = False
+
+
+    for i, c in enumerate(text[1:]):
+
+
+        if lastScript == unicodedata3.Script.Mongolian:
+            isMongolian = True
+        script = unicodedata3.script_cat(c)[0]
+        if script == lastScript or script == unicodedata3.Script.Inherited or ord(c) == 0x202f:
+#             print(c, script, lastScript)
+            continue
+        else:
+#             print(start, i)
+                yield text[start: i+1], isMongolian
+            isMongolian = False
+            start = i+1
+            lastScript = script
+#     return text[start: -1]
+#     print(text[start: -1], start, -1)
+    yield text[start: ], isMongolian
+
 
 def tokenize_split_suffix(text):
-    word_list_ = text.split(" ")
     word_list = []
-    for word in word_list_:
-        word = word.strip(STRIP_CHARS)
-        if not word.strip() == "" and containsMongolianChar(word):
+    for word, m in WordIter(text):
+        if m:
             stem, suffix = splitStemAndSuffix(word)
             if stem is None:
                 word_list.append(word)
@@ -121,11 +158,9 @@ def tokenize_split_suffix(text):
     return word_list
 
 def tokenize_no_split_suffix(text):
-    word_list_ = text.split(" ")
     word_list = []
-    for word in word_list_:
-        word = word.strip(STRIP_CHARS)
-        if not word.strip() == "" and containsMongolianChar(word):
+    for word, m in WordIter(text):
+        if m:
             word_list.append(word)
     return word_list
 
