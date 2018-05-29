@@ -18,7 +18,7 @@ from os import path
 # from progressbar import ProgressBar
 # from icu import UnicodeString, BreakIterator, Locale
 from collections import defaultdict
-import unicodedata3
+from . import unicodedata3
 
 import time
 import click
