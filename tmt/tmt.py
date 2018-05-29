@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python3
 # coding: utf-8
 
 # In[1]:
@@ -80,16 +80,16 @@ def CodeStr(text):
     return ",".join(["%04X"%(c) for c in ls])
 
 
-# ## pyicu is difficult to install 
-# 
+# ## pyicu is difficult to install
+#
 # ```
 # def split_line_with_icu(line):
 #     boundary = BreakIterator.createWordInstance(Locale.getUS())
 #     # text = "dasdf asdf asd f"
 #     boundary.setText(line)
-#     
+#
 #     word_list = []
-#     
+#
 #     start = boundary.first()
 # #         ls =[]
 #     for end in boundary:
@@ -100,7 +100,7 @@ def CodeStr(text):
 #         start = end
 #     return word_list
 # ```
-# 
+#
 
 # In[ ]:
 
@@ -115,6 +115,7 @@ def tokenize_split_suffix(text):
             if stem is None:
                 word_list.append(word)
             else:
+                word_list.append(word)
                 for s in suffix:
                     word_list.append(s)
     return word_list
@@ -136,9 +137,9 @@ def tokenize_no_split_suffix(text):
 def tokenize(text, split_suffix = False):
     if split_suffix:
         return tokenize_split_suffix(text)
-    else: 
+    else:
         return tokenize_no_split_suffix(text)
-        
+
 
 
 # In[10]:
@@ -155,24 +156,24 @@ def tokenize(text, split_suffix = False):
 def main(input_file, output_file, strip_mongolian_suffix):
 #     click.echo(input_file)
 #     click.echo(output_file)
-    
-        
-    
+
+
+
     word_dict = defaultdict(lambda :0)
 #     r = opendb()
     outfile_path =""
-    
-    
+
+
     split_line = tokenize
-        
-    
-    
+
+
+
     with open(input_file, "r") as in_file:
         for i, line in enumerate(in_file):
             line = line.strip()
             if line == "":
                 continue
-            for word in split_line(line):
+            for word in split_line(line, True):
                 ## word_dict[word] += 1
                 stem, suffix = splitStemAndSuffix(word)
                 if stem is None:
@@ -191,11 +192,11 @@ def main(input_file, output_file, strip_mongolian_suffix):
     #         #                 print(text)
     #                     ls = text.split(",")
     #                     ls.append(str(i))
-    #                     r.set(word, ",".join(set(ls)))         
+    #                     r.set(word, ",".join(set(ls)))
     with open(output_file, "w") as out_file:
         for word, count in sorted(word_dict.items(), key =lambda a: a[0]):
             print(word, CodeStr(word), count, file = out_file)
-            
+
 
 
 # In[11]:
@@ -203,6 +204,3 @@ def main(input_file, output_file, strip_mongolian_suffix):
 
 if __name__ == '__main__':
     main()
-    
-    
-
