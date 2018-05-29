@@ -116,7 +116,7 @@ def WordIter(text):
 
 
     if len (text ) == 1:
-        return unicodedata3.script_cat(tex)[0],  unicodedata3.script_cat(text[0])[0] == unicodedata3.Script.Mongolian
+        return unicodedata3.script_cat(text)[0],  unicodedata3.script_cat(text[0])[0] == unicodedata3.Script.Mongolian
 
     script = -1
     lastScript = unicodedata3.script_cat(text[0])[0]
