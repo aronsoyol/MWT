@@ -135,7 +135,7 @@ def WordIter(text):
             continue
         else:
 #             print(start, i)
-                yield text[start: i+1], isMongolian
+            yield text[start: i+1], isMongolian
             isMongolian = False
             start = i+1
             lastScript = script
