@@ -110,6 +110,22 @@ def CodeStr(text):
 #
 
 # In[ ]:
+def sentenceIter(text):
+    #     print(len(text2))
+
+
+    if len (text ) == 1:
+        return text
+
+    start = 0
+
+    for i, c in enumerate(text):
+
+        if c in ["᠃"]:
+            yield text[start: i+1]
+            start = i + 1
+    yield text[start: ]
+
 
 def WordIter(text):
 #     print(len(text2))
