@@ -46,7 +46,8 @@ def containsMongolianChar(word):
 
 MONGOLIAN_PUNCTUATIONS = "".join([chr(w) for w in range(0x1800,0x180a)])
 MONGOLIAN_DIGISTS = "".join([chr(w) for w in range(0x1810,0x181a)])
-MONGOLIAN_CONTROL_CHAR = "".join([chr(w) for w in range(0x180b,0x180f)])+"\u200d"
+MONGOLIAN_CONTROL_CHAR = "".join(
+    [chr(w) for w in range(0x180b, 0x180f)]) + "\u200c\u200d"
 # CodeStr(MONGOLIAN_CONTROL_CHAR)
 
 
@@ -71,7 +72,7 @@ def splitStemAndSuffix(word):
     """
     ls = word.split("\u202f")
     if len(ls) > 1:
-        return ls[0], ["\u202f" + s for s in ls[1:]]
+        return " " if not ls[0] else ls[0], ["\u202f" + s for s in ls[1:]]
     else:
         return None, None
 # stem, suffix = splitStemAndSuffix("asdf")
@@ -150,8 +151,11 @@ def WordIter(text):
 #             print(c, script, lastScript)
             continue
         else:
-#             print(start, i)
-            yield text[start: i+1], isMongolian
+
+            #             print(start, i)
+            word = text[start: i +1]
+            if not word.strip(MONGOLIAN_CONTROL_CHAR) == "":
+                yield word, isMongolian
             isMongolian = False
             start = i+1
             lastScript = script
@@ -164,6 +168,7 @@ def tokenize_split_suffix(text):
     word_list = []
     for word, m in WordIter(text):
         if m:
+            word.strip(STRIP_CHARS)
             stem, suffix = splitStemAndSuffix(word)
             if stem is None:
                 word_list.append(word)
@@ -171,6 +176,18 @@ def tokenize_split_suffix(text):
                 word_list.append(stem)
                 for s in suffix:
                     word_list.append(s)
+    return word_list
+
+
+def tokenize_split_suffix_strip_suffix(text):
+    word_list = []
+    for word, m in WordIter(text):
+        if m:
+            stem, suffix = splitStemAndSuffix(word)
+            if stem is None:
+                word_list.append(word)
+            else:
+                word_list.append(stem)
     return word_list
 
 def tokenize_no_split_suffix(text):
@@ -185,9 +202,12 @@ def tokenize_no_split_suffix(text):
 # In[9]:
 
 
-def tokenize(text, split_suffix = False):
+def tokenize(text, split_suffix = False, strip_suffix=False):
     if split_suffix:
-        return tokenize_split_suffix(text)
+        if strip_suffix:
+            return tokenize_split_suffix_strip_suffix(text)
+        else:
+            return tokenize_split_suffix(text)
     else:
         return tokenize_no_split_suffix(text)
 
