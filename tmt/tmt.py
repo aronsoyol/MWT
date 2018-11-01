@@ -33,6 +33,9 @@ import click
 
 # In[4]:
 
+def get_version():
+    return "1.1.1"
+
 
 def containsMongolianChar(word):
     for ch in word:
@@ -74,7 +77,7 @@ def splitStemAndSuffix(word):
     if len(ls) > 1:
         return " " if not ls[0] else ls[0], ["\u202f" + s for s in ls[1:]]
     else:
-        return None, None
+        return None
 # stem, suffix = splitStemAndSuffix("asdf")
 
 
@@ -131,7 +134,8 @@ def sentenceIter(text):
 def WordIter(text):
 #     print(len(text2))
 
-
+    if not text:
+        raise Exception("text is none")
     if len (text ) == 1:
         return unicodedata3.script_cat(text)[0],  unicodedata3.script_cat(text[0])[0] == unicodedata3.Script.Mongolian
 
@@ -166,37 +170,55 @@ def WordIter(text):
 
 def tokenize_split_suffix(text):
     word_list = []
-    for word, m in WordIter(text):
-        if m:
-            word.strip(STRIP_CHARS)
-            stem, suffix = splitStemAndSuffix(word)
-            if stem is None:
-                word_list.append(word)
-            else:
-                word_list.append(stem)
-                for s in suffix:
-                    word_list.append(s)
+    for word_text in text.split(" "):
+        if not word_text:
+            continue
+        for word, m in WordIter(word_text):
+            if m:
+                word.strip(STRIP_CHARS)
+                ls = word.split("\u202f")
+                
+                if len(ls) <= 1:
+                    word_list.append(word)
+                else:
+                    stem = ls[0]
+                    if stem:
+                        word_list.append(stem)
+                    for s in ls[1:]:
+                        word_list.append(s)
     return word_list
 
-
+def aaa():
+    pass
 def tokenize_split_suffix_strip_suffix(text):
     word_list = []
-    for word, m in WordIter(text):
-        if m:
-            stem, suffix = splitStemAndSuffix(word)
-            if stem is None:
-                word_list.append(word)
-            else:
-                word_list.append(stem)
+    for word_text in text.split(" "):
+        if not word_text:
+            continue
+        for word, m in WordIter(word_text):
+            if m :
+                word = word.strip(STRIP_CHARS)
+                ls = word.split("\u202f")
+
+                if len(ls) <= 1:
+                    word_list.append(word)
+                else:
+                    stem = ls[0]
+                    if stem:
+                        word_list.append(stem)
     return word_list
 
 def tokenize_no_split_suffix(text):
     word_list = []
-    for word, m in WordIter(text):
-        if m:
-            word_list.append(word)
-    return word_list
+    for word_text in text.split(" "):
+        if not word_text:
+            continue
+        for word, m in WordIter(word_text):
+            if m:
+                word = word.strip(STRIP_CHARS)
 
+                word_list.append(word)
+    return word_list
 
 
 # In[9]:
